@@ -27,14 +27,7 @@ public class Generator {
 			if(phrase.matches("-*[0-9]")) {
 				break;
 			}
-			String[] words = phrase.split(" ");
-			String lastWord = words[words.length - 1];
-			String[] vector = getVector(lastWord.replaceAll("[^a-zA-Z]", ""));			
-			if (vector == null) {
-				System.out.println("didn't work");
-				continue;
-			}
-			String celebrity = getCelebrity(vector);
+			String celebrity = getCelebrityFromPhrase(phrase);
 			System.out.println(celebrity);
 //			System.out.println("Again?");
 //			String answer = kb.nextLine();
@@ -42,8 +35,16 @@ public class Generator {
 		}
 			
 	}
-
-	private static String getCelebrity(String[] vector) {  // TODO: rewrite to put all in memory first
+	private static String getCelebrityFromPhrase(String phrase) {
+		String[] words = phrase.split(" ");
+		String lastWord = words[words.length - 1];
+		String[] vector = getVector(lastWord.replaceAll("[^a-zA-Z]", ""));			
+		if (vector == null) {
+			return null;
+		}
+		return getCelebrityFromVector(vector);
+	}
+	private static String getCelebrityFromVector(String[] vector) {  // TODO: rewrite to put all in memory first
 		File f = new File(CELEBS_FILE_NAME);
 		try {
 			Scanner sc = new Scanner(f);
