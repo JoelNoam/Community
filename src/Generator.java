@@ -2,13 +2,18 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.security.KeyStore.Entry;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map.*;
 import java.util.Scanner;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+
+
 
 public class Generator {
 	private static final String DICT_FILE_NAME = "cmudict.dict";
@@ -27,7 +32,12 @@ public class Generator {
 			if(phrase.matches("-*[0-9]")) {
 				break;
 			}
-			String celebrity = getCelebrityFromPhrase(phrase);
+//			String celebrity = getCelebrityFromPhrase(phrase);
+			Data d = new Data();
+			Data.Phonemes[] phraseV = d.getVector(phrase);
+			String celebrity = getRhymingCeleb(phraseV, d.getCelebs());
+			
+			
 			System.out.println(celebrity);
 //			System.out.println("Again?");
 //			String answer = kb.nextLine();
@@ -35,15 +45,39 @@ public class Generator {
 		}
 			
 	}
-	private static String getCelebrityFromPhrase(String phrase) {
-		String[] words = phrase.split(" ");
-		String lastWord = words[words.length - 1];
-		String[] vector = getVector(lastWord.replaceAll("[^a-zA-Z]", ""));			
-		if (vector == null) {
-			return null;
+	private static String getRhymingCeleb(Data.Phonemes[] phraseV, LinkedHashMap<String, Data.Phonemes[]> celebs) {
+		String line = "";
+		String name = "";
+		String pronun = "";
+		String bestName = "";
+		int maxRhyme = 0;
+		Data.Phonemes[] celebV;
+//		while(sc.hasNextLine()) { // for each celebrity
+		for(java.util.Map.Entry<String, Data.Phonemes[]> entry : celebs.entrySet()) {
+			
+			name = entry.getKey();
+			celebV = entry.getValue();
+			int rhyme = scoreRhyme(phraseV, celebV);
+			
+			if(rhyme > maxRhyme) {
+				maxRhyme = rhyme;
+				bestName = name;
+			}
 		}
-		return getCelebrityFromVector(vector);
+		return bestName;
+		
 	}
+	private static int scoreRhyme(Data.Phonemes[] phraseV, Data.Phonemes[] celebV) {
+		// TODO Auto-generated method stub
+		int i=0;
+		for(; i < Math.min(phraseV.length, celebV.length); i++) {
+			if(phraseV[phraseV.length-i-1] != celebV[celebV.length-i-1]) {
+				break;
+			}
+		}
+		return i;
+	}
+
 	private static String getCelebrityFromVector(String[] vector) {  // TODO: rewrite to put all in memory first
 		File f = new File(CELEBS_FILE_NAME);
 		try {
@@ -84,56 +118,8 @@ public class Generator {
 		return i;
 	}
 
-	private static String[] getVector(String word) {
-		String pronun = getPronun(word);
-//		String pronun = getPronunInet(word);
-		if(pronun == null) {
-			return null;
-		}
-//		ArrayList<String> vector = new ArrayList<String>();
-		String[] parts = pronun.split(" ");
-		return parts;
-//		vector.addAll(Arrays.asList(parts));
-//		return vector;
-	}
-	private static String getPronun(String word) {
-		String prefix = word.toLowerCase() + " "; //TODO: deal w/ multiple pronunciations
-		File f = new File(DICT_FILE_NAME);
-		try {
-			Scanner sc = new Scanner(f);
-			String line = "";
-//			System.out.println("prefix: " + prefix);
-			while(sc.hasNextLine()) {
-				line = sc.nextLine();
-				if(line.startsWith(prefix)) {
-//					System.out.println(line);
-					String pronun = line.replaceFirst(prefix, "")
-							.replaceAll("[0-9]", ""); // strips accent
-					return pronun;
-				}
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-	
-		return null;
-	}
 
-	private static String getPronunInet(String word) {
-		String html = null;
-		URLConnection connection = null;
-		try {
-		  connection =  new URL("http://www.speech.cs.cmu.edu/cgi-bin/cmudict?in=" + word).openConnection();
-//		  System.out.println("Connected");
-		  Scanner scanner = new Scanner(connection.getInputStream());
-		  scanner.useDelimiter("\\Z");
-		  html = scanner.next();
-		}catch ( Exception ex ) {
-		    ex.printStackTrace();
-		}
-		Document doc = Jsoup.parse(html);
-		Elements pronunEl = doc.select("body > div > tt:nth-child(5)");
-		return pronunEl.text();
-		
-	}
+
+
+
 }
