@@ -1,17 +1,11 @@
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.security.KeyStore.Entry;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
-import java.util.Map.*;
+import java.util.Random;
 import java.util.Scanner;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
+
 
 
 
@@ -25,16 +19,17 @@ public class Generator {
 		boolean running = true;
 		
 		
-		
+
+		Data d = new Data();
 		while (running) {
 			System.out.print("Enter a word or phrase: ");
 			phrase = kb.nextLine();
-			if(phrase.matches("-*[0-9]")) {
+			if(phrase.matches("-*[0-9]*")) {
 				break;
 			}
 //			String celebrity = getCelebrityFromPhrase(phrase);
-			Data d = new Data();
-			Data.Phonemes[] phraseV = d.getVector(phrase);
+			Data.Phoneme[] phraseV = d.getVector(phrase);
+//			System.out.println(d.getCelebs().getRoot().getCelebs(phraseV).get(3));
 			String celebrity = getRhymingCeleb(phraseV, d.getCelebs());
 			
 			
@@ -45,15 +40,28 @@ public class Generator {
 		}
 			
 	}
-	private static String getRhymingCeleb(Data.Phonemes[] phraseV, LinkedHashMap<String, Data.Phonemes[]> celebs) {
+	private static String getRhymingCeleb(Data.Phoneme[] phraseV, Trie celebs) {
+		// TODO Auto-generated method stub
+		ArrayList<String> rhymes = celebs.getRhymes(phraseV);
+		if(rhymes == null) { // no rhyme
+			return null;
+		}
+//		for(String rhyme : rhymes) {
+//			System.out.println(rhyme);
+//		}
+		Random r = new Random();
+		int index = r.nextInt(rhymes.size());
+		return rhymes.get(index);
+	}
+	private static String getRhymingCeleb(Data.Phoneme[] phraseV, LinkedHashMap<String, Data.Phoneme[]> celebs) {
 		String line = "";
 		String name = "";
 		String pronun = "";
 		String bestName = "";
 		int maxRhyme = 0;
-		Data.Phonemes[] celebV;
+		Data.Phoneme[] celebV;
 //		while(sc.hasNextLine()) { // for each celebrity
-		for(java.util.Map.Entry<String, Data.Phonemes[]> entry : celebs.entrySet()) {
+		for(java.util.Map.Entry<String, Data.Phoneme[]> entry : celebs.entrySet()) {
 			
 			name = entry.getKey();
 			celebV = entry.getValue();
@@ -67,7 +75,7 @@ public class Generator {
 		return bestName;
 		
 	}
-	private static int scoreRhyme(Data.Phonemes[] phraseV, Data.Phonemes[] celebV) {
+	private static int scoreRhyme(Data.Phoneme[] phraseV, Data.Phoneme[] celebV) {
 		// TODO Auto-generated method stub
 		int i=0;
 		for(; i < Math.min(phraseV.length, celebV.length); i++) {

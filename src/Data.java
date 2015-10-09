@@ -11,35 +11,36 @@ import org.jsoup.select.Elements;
 
 
 public class Data {
-	
-	
+		
 	private static final String DICT_FILE_NAME = "cmudict.dict";
 	private static final String CELEBS_FILE_NAME = "celebs";
-	public enum Phonemes { AA, AE, AH, AO, AW, AY, B, CH, D, DH, EH, ER, EY, F, G,
+	public enum Phoneme { AA, AE, AH, AO, AW, AY, B, CH, D, DH, EH, ER, EY, F, G,
 		HH, IH, IY, JH, K, L, M, N, NG, OW, OY, P, R, S, SH, T, TH, UH, UW, V, W, Y, Z, ZH}
 	
 //	private char[][] words;  // should eventually be a trie(?)
 //	private char[][] celebs;  // should eventually be a trie
-	private LinkedHashMap<String, Phonemes[]> celebs;  // key is name, String 
+//	private LinkedHashMap<String, Phoneme[]> celebs;  // key is name, String 
+	private Trie celebs;
 	// phonemes are stored front to back
 	
 	public Data() {
 		File celebsFile = new File(CELEBS_FILE_NAME);
-		celebs = new LinkedHashMap<String, Phonemes[]>();
+//		celebs = new LinkedHashMap<String, Phoneme[]>();
+		celebs = new Trie();
 		try {
 			Scanner sc = new Scanner(celebsFile);
 			String line;
 			String name;
 			String[] celebStrings;
-			Phonemes[] celebV;
+			Phoneme[] celebV;
 			while(sc.hasNextLine()) { // for each celebrity
 				line = sc.nextLine();
 				String[] words = line.split("\t");
 				name = words[0];
 				celebStrings = words[1].split(" ");
-				celebV = new Phonemes[celebStrings.length];
+				celebV = new Phoneme[celebStrings.length];
 				for(int i = 0; i < celebStrings.length; i++) {
-					celebV[i] = Phonemes.valueOf(celebStrings[i]);
+					celebV[i] = Phoneme.valueOf(celebStrings[i]);
 				}
 				celebs.put(name, celebV);
 			}
@@ -50,15 +51,14 @@ public class Data {
 		}
 	}
 	
-	public LinkedHashMap<String, Phonemes[]> getCelebs() {
+	public Trie getCelebs() {
 		return celebs;
 	}
-	public Phonemes[] getCelebV(String name) {
-		return celebs.get(name);
-		
-	}
+//	public Phoneme[] getCelebV(String name) {
+//		return celebs.get(name);		
+//	}
 
-	public Phonemes[] getVector(String phrase) {
+	public Phoneme[] getVector(String phrase) {
 		// TODO Auto-generated method stub
 		String[] words = phrase.split(" ");
 		String word = words[words.length-1];
@@ -75,9 +75,9 @@ public class Data {
 					String pronun = line.replaceFirst(prefix, "")
 							.replaceAll("[0-9]", ""); // strips accent
 					String[] parts = pronun.split(" ");
-					Phonemes[] vector = new Phonemes[parts.length];
+					Phoneme[] vector = new Phoneme[parts.length];
 					for(int i = 0; i < parts.length; i++) {
-						vector[i] = Phonemes.valueOf(parts[i]);
+						vector[i] = Phoneme.valueOf(parts[i]);
 					}
 					return vector;
 				}
