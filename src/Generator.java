@@ -30,6 +30,11 @@ public class Generator {
 //			String celebrity = getCelebrityFromPhrase(phrase);
 			Data.Phoneme[] phraseV = d.getVector(phrase);
 //			System.out.println(d.getCelebs().getRoot().getCelebs(phraseV).get(3));
+			if(phraseV == null) {
+				System.out.println("Last word of phrase not found in dictionary");
+				kb.nextLine();
+				continue;
+			}
 			String celebrity = getRhymingCeleb(phraseV, d.getCelebs());
 			
 			
