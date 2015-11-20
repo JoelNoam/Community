@@ -21,4 +21,7 @@ public class Trie {
 	public ArrayList<String> getRhymes(Data.Phoneme[] pronun) {
 		return root.getCelebs(pronun);
 	}
+	public ArrayList<String> getRhymes(Data.Phoneme[] pronun, boolean stopAtVowel) {
+		return root.getCelebs(pronun, stopAtVowel);
+	}
 }

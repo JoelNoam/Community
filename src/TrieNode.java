@@ -16,7 +16,7 @@ public class TrieNode {
 	}
 	
 	public void addCeleb(String celebName, Data.Phoneme[] pronun) {
-		int L = level; // for debugging
+//		int L = level; // for debugging
 		celebs.add(celebName);
 //		TrieNode child = getChild(pronun[pronun.length - 1 - level]);
 		if(pronun.length <= level + 1) {  // base case
@@ -46,6 +46,35 @@ public class TrieNode {
 		Data.Phoneme phoneme = pronun[pronun.length - 1 - level];
 		if(children.containsKey(phoneme)) { // has appropriate child
 			return children.get(phoneme).getCelebs(pronun);
+		}
+		if(level != 0) { // don't return entire list if no rhyme
+			return celebs;
+		}
+		return null;
+		
+	}
+	public ArrayList<String> getCelebs(Data.Phoneme[] pronun, boolean stopAtVowel) {
+//		if(level != 0) {
+//			Data.Phoneme cur = pronun[pronun.length - level];
+//			System.out.print("Phoneme is " + cur + ".  It is ");
+//			System.out.print(cur.isVowel() ? "" : "not ");
+//			System.out.println("a vowel.");
+//		}
+//		System.out.println("level " + level);
+//		for(String celeb : celebs) {
+//			System.out.println(celeb);
+//		}
+//		System.out.println("**********************************");
+		if(pronun.length <= level) { // run out of phonemes
+			return celebs;
+		}								// current Phoneme is a vowel
+		if(level != 0 && stopAtVowel && pronun[pronun.length - level].isVowel()) {
+			return celebs;
+		}
+		// here, more phonemes to look at
+		Data.Phoneme nextPhoneme = pronun[pronun.length - 1 - level];
+		if(children.containsKey(nextPhoneme)) { // has appropriate child
+			return children.get(nextPhoneme).getCelebs(pronun, stopAtVowel);
 		}
 		if(level != 0) { // don't return entire list if no rhyme
 			return celebs;
