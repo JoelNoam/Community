@@ -4,10 +4,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.ArrayList;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
 
 
 public class Data {
@@ -28,18 +26,21 @@ public class Data {
 	}
 	
 	private HashMap<String,Data.Phoneme[]> words;
-	private Trie celebs;
+	private Trie suffixTrie;
+	//private PrefixTrie prefixTrie;
+	private HashMap<Phoneme,ArrayList<String>> finalVowelTable;
 	// phonemes are stored front to back
 	
 	public Data() {
 		File celebsFile = new File(CELEBS_FILE_NAME);
 		File wordsFile = new File(DICT_FILE_NAME);
-		celebs = new Trie();
+		suffixTrie = new Trie();
+		finalVowelTable = new HashMap<Phoneme,ArrayList<String>>();
 		try {
 			Scanner sc = new Scanner(celebsFile);
 			String line;
 			String name;
-			String[] celebStrings;
+			String[] celebStrings; // each element is an arpabet symbol
 			Phoneme[] celebV;
 			while(sc.hasNextLine()) { // for each celebrity
 				line = sc.nextLine();
@@ -50,8 +51,23 @@ public class Data {
 				for(int i = 0; i < celebStrings.length; i++) {
 					celebV[i] = Phoneme.valueOf(celebStrings[i]);
 				}
-				celebs.put(name, celebV);
+				suffixTrie.put(name, celebV);
+				//prefixTrie.put(name, celebV);
+				for(int i = celebV.length - 1; i >= 0; i--) {
+					if(celebV[i].isVowel()) {
+						ArrayList<String> L = finalVowelTable.get(celebV[i]);
+						if(L == null) {
+							L = new ArrayList<String>();
+							finalVowelTable.put(celebV[i], L);
+						}
+						L.add(name);
+						break;
+					}
+				}
 			}
+			//System.out.println(finalVowelTable);
+			
+			
 			sc = new Scanner(wordsFile);
 			line = "";
 //			System.out.println("prefix: " + prefix);
@@ -74,16 +90,39 @@ public class Data {
 			}
 //			System.out.println("words.size() == " + words.size());	
 //			System.out.println(words.get("tuple"));
-			
 				
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
 	}
-	
-	public Trie getCelebs() {
-		return celebs;
+	public ArrayList<String> getRhymes(Phoneme[] pronun, String rhymeType) {
+		switch(rhymeType) { // works in java 7, should be lower case
+			case "end":
+				return suffixTrie.getEndRhymes(pronun);
+			case "double":
+				return suffixTrie.getDoubleRhymes(pronun);
+			case "triple":
+				return suffixTrie.getTripleRhymes(pronun);
+			case "assonance":
+				Phoneme p = null;
+				for(int i = pronun.length - 1; i >= 0; i--) {
+					if(pronun[i].isVowel()) {
+						p = pronun[i];
+						break;
+					}
+				}
+				return finalVowelTable.get(p);
+			default:
+				return suffixTrie.getEndRhymes(pronun);
+		}
 	}
+	
+	/*public Trie getCelebs() {
+		return celebs;
+	}*/
+	/*public PrefixTrie getPrefixTrie() {
+		return prefixTrie;
+	} */
 
 	public Phoneme[] getVector(String phrase) {
 		String[] parts = phrase.split(" ");
@@ -91,7 +130,4 @@ public class Data {
 		return words.get(word);
 	
 	}
-
-
-	
 }

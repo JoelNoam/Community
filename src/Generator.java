@@ -27,6 +27,8 @@ public class Generator {
 		long eTime = System.nanoTime();
 		System.out.println("Time to load: " + (eTime - sTime)/1e9);
 		System.out.println("used: " + (runtime.totalMemory()-runtime.freeMemory())/(1024*1024));
+		System.out.print("Enter rhyme type: ");
+		String rhymeType = kb.nextLine();
 		while (running) {
 			System.out.print("Enter a word or phrase: ");
 			phrase = kb.nextLine();
@@ -41,17 +43,25 @@ public class Generator {
 				kb.nextLine();
 				continue;
 			}
-			String celebrity = getRhymingCeleb(phraseV, d.getCelebs());
+			//String celebrity = getRhymingCeleb(phraseV, d.getCelebs());
+			ArrayList<String> rhymes = d.getRhymes(phraseV,rhymeType);
+			if(null != rhymes && !rhymes.isEmpty()) {
+				for(String r : rhymes) {
+					System.out.println(r);
+				}
+			} else {
+				System.out.println("no rhymes found");
+			}
 			
 			
-			System.out.println(celebrity);
+			//System.out.println(celebrity);
 //			System.out.println("Again?");
 //			String answer = kb.nextLine();
 //			running =  answer.startsWith("Y") || answer.startsWith("y");
 		}
 			
 	}
-	private static String getRhymingCeleb(Data.Phoneme[] phraseV, Trie celebs) {
+	/*private static String getRhymingCeleb(Data.Phoneme[] phraseV, Trie celebs) {
 		// TODO Auto-generated method stub
 		ArrayList<String> rhymes = celebs.getRhymes(phraseV,true);
 		if(rhymes == null) { // no rhyme
@@ -63,6 +73,6 @@ public class Generator {
 		Random r = new Random();
 		int index = r.nextInt(rhymes.size());
 		return rhymes.get(index);
-	}
+	}*/
 
 }
