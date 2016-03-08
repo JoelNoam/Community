@@ -9,7 +9,6 @@ public class TrieNode {
 	HashMap<Data.Phoneme, TrieNode> children;
 	
 	public TrieNode(int level) {
-		// TODO Auto-generated constructor stub
 		this.level = level;
 		celebs = new ArrayList<String>();
 		children = new HashMap<Data.Phoneme, TrieNode>();
@@ -172,6 +171,37 @@ public class TrieNode {
 		return null;
 	}
 
+	public ArrayList<String> getNearRhymes(Data.Phoneme[] pronun) {
+		if(pronun.length < level) { // run out of phonemes
+			return null;
+		}				// current Phoneme is a vowel
+		if(level != 0 && pronun[pronun.length - level].isVowel()) {
+			return celebs;
+		}
+		// here, more phonemes to look at
+		Data.Phoneme nextPhoneme = pronun[pronun.length - 1 - level];
+		ArrayList<String> rhymes = new ArrayList<String>();
+//		System.out.println("nextPhoneme: " + nextPhoneme);
+		if(children.containsKey(nextPhoneme)) { // has appropriate child
+			ArrayList<String> c = children.get(nextPhoneme).getNearRhymes(pronun);
+			if(null != c) {
+				rhymes.addAll(c);
+			}
+		}
+		for(Data.Phoneme p : nextPhoneme.similars()) {
+//			System.out.print(p + "?");
+			if(children.containsKey(p)) { // has appropriate child
+//				System.out.println(" yes");
+				ArrayList<String> c = children.get(p).getNearRhymes(pronun);
+				if(null != c) {
+					rhymes.addAll(c);
+				}
+			} else {
+//				System.out.println(" no");
+			}
+		}
+		return rhymes;
+	}
 	public ArrayList<String> getCelebs() {
 		// TODO Auto-generated method stub
 		return celebs;

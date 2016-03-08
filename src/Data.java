@@ -23,6 +23,38 @@ public class Data {
 	                        return false;
 	        }
 		}
+		public Phoneme[] similars() { // doesn't return itself
+			switch(this) {
+			//labial
+			case P: return new Phoneme[]{B,F};
+			case B: return new Phoneme[]{P,V};
+			case F: return new Phoneme[]{P,V};
+			case V: return new Phoneme[]{B,F,W};
+			case M: return new Phoneme[]{N}; // nasal
+			case W: return new Phoneme[]{V};
+			//dent/alv
+			case TH: return new Phoneme[]{DH,T,S};
+			case DH: return new Phoneme[]{TH,D,Z};
+			case T: return new Phoneme[]{TH,D};
+			case D: return new Phoneme[]{DH,T};
+			case S: return new Phoneme[]{TH,Z};
+			case Z: return new Phoneme[]{DH,S};
+			case N: return new Phoneme[]{M,NG};
+			case L: return new Phoneme[]{R};
+			case R: return new Phoneme[]{L};
+			//pal
+			case CH: return new Phoneme[]{JH,SH,ZH};
+			case JH: return new Phoneme[]{CH,SH,ZH};
+			case SH: return new Phoneme[]{CH,JH,ZH};
+			case ZH: return new Phoneme[]{CH,JH,SH};
+			case Y: return new Phoneme[]{};
+			//vel
+			case K: return new Phoneme[]{G};
+			case G: return new Phoneme[]{K,NG};
+			case NG: return new Phoneme[]{N,G};
+			default: return new Phoneme[]{};
+			}
+		}
 	}
 	
 	private HashMap<String,Data.Phoneme[]> words;
@@ -88,13 +120,20 @@ public class Data {
 				}
 				words.put(word, pronun);
 			}
-//			System.out.println("words.size() == " + words.size());	
+//			System.out.println("words.size() == " + words.size());
 //			System.out.println(words.get("tuple"));
 				
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	 * Returns an ArrayList<String> of celebrity names (all caps)
+	 * 
+	 * @param pronun pronunciation of the word/phrase to be rhymed
+	 * @param rhymeType possibilities are "end" (default), "double", "triple", "assonance"
+	 */
 	public ArrayList<String> getRhymes(Phoneme[] pronun, String rhymeType) {
 		switch(rhymeType) { // works in java 7, should be lower case
 			case "end":
@@ -112,6 +151,8 @@ public class Data {
 					}
 				}
 				return finalVowelTable.get(p);
+			case "near":
+				return suffixTrie.getNearRhymes(pronun);
 			default:
 				return suffixTrie.getEndRhymes(pronun);
 		}
