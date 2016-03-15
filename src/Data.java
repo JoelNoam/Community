@@ -1,7 +1,6 @@
+
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Scanner;
 import java.util.ArrayList;
@@ -127,6 +126,25 @@ public class Data {
 			e.printStackTrace();
 		}
 	}
+	public ArrayList<String> getRhymes(Phoneme[] pronun, String rhymeType, int vowels, boolean near) {
+		switch(rhymeType) {
+			case "end":
+				return suffixTrie.getMultiRhymes(pronun, vowels, near);
+			case "assonance": // TODO make vowel trie, or do something for more than 1 vowel
+				Phoneme p = null;
+				for(int i = pronun.length - 1; i >= 0; i--) {
+					if(pronun[i].isVowel()) {
+						p = pronun[i];
+						break;
+					}
+				}
+				return finalVowelTable.get(p);
+			case "consonance":
+				return suffixTrie.getConsonanceRhymes(pronun);
+			default:
+				return suffixTrie.getMultiRhymes(pronun, vowels, near);
+		}
+	}
 	
 	/**
 	 * Returns an ArrayList<String> of celebrity names (all caps)
@@ -153,6 +171,16 @@ public class Data {
 				return finalVowelTable.get(p);
 			case "near":
 				return suffixTrie.getNearRhymes(pronun);
+			case "test":
+				Scanner kb = new Scanner(System.in);
+				System.out.println("How many vowels? near?");
+				int vowels = kb.nextInt();
+				String near = kb.next();
+				if("y".equals(near)) {
+					return(suffixTrie.getMultiRhymes(pronun,vowels,true));
+				} else {
+					return(suffixTrie.getMultiRhymes(pronun,vowels,false));					
+				}
 			default:
 				return suffixTrie.getEndRhymes(pronun);
 		}

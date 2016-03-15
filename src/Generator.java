@@ -27,8 +27,14 @@ public class Generator {
 		long eTime = System.nanoTime();
 		System.out.println("Time to load: " + (eTime - sTime)/1e9);
 		System.out.println("used: " + (runtime.totalMemory()-runtime.freeMemory())/(1024*1024));
-		System.out.print("Enter rhyme type: ");
-		String rhymeType = kb.nextLine();
+		String rhymeType = "end";
+		int vowels = -1;
+		boolean near;
+		System.out.print("Enter rhyme type, vowels, near(y/n): ");
+		rhymeType = kb.next();
+		vowels = kb.nextInt();
+		near = "y".equals(kb.next());
+		kb.nextLine();
 		while (running) {
 			System.out.print("Enter a word or phrase: ");
 			phrase = kb.nextLine();
@@ -44,7 +50,8 @@ public class Generator {
 				continue;
 			}
 			//String celebrity = getRhymingCeleb(phraseV, d.getCelebs());
-			ArrayList<String> rhymes = d.getRhymes(phraseV,rhymeType);
+//			ArrayList<String> rhymes = d.getRhymes(phraseV,rhymeType);
+			ArrayList<String> rhymes = d.getRhymes(phraseV,rhymeType,vowels,near);
 			if(null != rhymes && !rhymes.isEmpty()) {
 				for(String r : rhymes) {
 					System.out.println(r);

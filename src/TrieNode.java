@@ -163,6 +163,51 @@ public class TrieNode {
 		}
 		return null;
 	}
+	public ArrayList<String> getMultiRhymes(Data.Phoneme[] pronun, int vowelsLeft, boolean nearRhyme) {
+		if(pronun.length < level) { // run out of phonemes
+			return new ArrayList<String>();
+		}				// current Phoneme is a vowel
+		if(level != 0 && pronun[pronun.length - level].isVowel()) {
+			vowelsLeft--;
+			if(vowelsLeft == 0) {
+				return celebs;
+			}
+		}
+		if(pronun.length == level) {
+			return new ArrayList<String>();
+		}
+		// here, more phonemes to look at
+		Data.Phoneme nextPhoneme = pronun[pronun.length - 1 - level];
+		ArrayList<String> rhymes = new ArrayList<String>();
+//				System.out.println("nextPhoneme: " + nextPhoneme);
+		if(children.containsKey(nextPhoneme)) { // has appropriate child
+			ArrayList<String> c = children.get(nextPhoneme).getMultiRhymes(pronun,vowelsLeft,nearRhyme);
+			if(null != c) {
+				rhymes.addAll(c);
+			}
+		}
+		if(nearRhyme) {
+			for(Data.Phoneme p : nextPhoneme.similars()) {
+	//					System.out.print(p + "?");
+				if(children.containsKey(p)) { // has appropriate child
+	//						System.out.println(" yes");
+					ArrayList<String> c = children.get(p).getMultiRhymes(pronun,vowelsLeft,nearRhyme);
+					if(null != c) {
+						rhymes.addAll(c);
+					}
+				} else {
+	//						System.out.println(" no");
+				}
+			}
+		}
+		return rhymes;
+//		// here, more phonemes to look at
+//		Data.Phoneme nextPhoneme = pronun[pronun.length - 1 - level];
+//		if(children.containsKey(nextPhoneme)) { // has appropriate child
+//			return children.get(nextPhoneme).getMultiRhymes(pronun,vowelsLeft);
+//		}
+//		return null;
+	}
 	public ArrayList<String> getConsonanceRhymes(Data.Phoneme[] pronun) {
 		Data.Phoneme last = pronun[pronun.length-1];
 		if(!last.isVowel()) { // if the final phoneme is a consonant
@@ -173,7 +218,7 @@ public class TrieNode {
 
 	public ArrayList<String> getNearRhymes(Data.Phoneme[] pronun) {
 		if(pronun.length < level) { // run out of phonemes
-			return null;
+			return new ArrayList<String>();
 		}				// current Phoneme is a vowel
 		if(level != 0 && pronun[pronun.length - level].isVowel()) {
 			return celebs;

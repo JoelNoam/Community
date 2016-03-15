@@ -36,6 +36,12 @@ public class Trie {
 	public ArrayList<String> getNearRhymes(Data.Phoneme[] pronun) {
 		return root.getNearRhymes(pronun);
 	}
+	public ArrayList<String> getMultiRhymes(Data.Phoneme[] pronun, int vowelsLeft, boolean nearRhyme) {
+		return root.getMultiRhymes(pronun,vowelsLeft,nearRhyme);
+	}
+	public ArrayList<String> getConsonanceRhymes(Data.Phoneme[] pronun) {
+		return root.getConsonanceRhymes(pronun);
+	}
 	public ArrayList<String> getRhymes(Data.Phoneme[] pronun, String rhymeType) {
 		switch(rhymeType) { // works in java 7, should be lower case
 			case "end":
