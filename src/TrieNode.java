@@ -2,6 +2,7 @@
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class TrieNode {
 	int level; // root is zero
@@ -214,6 +215,30 @@ public class TrieNode {
 			return children.get(last).getCelebs();
 		}
 		return null;
+	}
+
+	public ArrayList<String> getAssonanceRhymes(Data.Phoneme[] vowels, int vowelIndex) {
+		//System.out.println("in method");
+		if(vowelIndex < 0) {
+			return celebs;
+		}
+		Data.Phoneme nextVowel = vowels[vowelIndex];
+		ArrayList<String> rhymes = new ArrayList<String>();
+//				System.out.println("nextPhoneme: " + nextPhoneme);
+		for(Map.Entry<Data.Phoneme,TrieNode> e : children.entrySet()) {
+			if(e.getKey() == nextVowel) {
+				ArrayList<String> l = e.getValue().getAssonanceRhymes(vowels,vowelIndex-1);
+				if(null != l) {
+					rhymes.addAll(l);
+				}
+			} else if(e.getKey().isConsonant()) {
+				ArrayList<String> l = e.getValue().getAssonanceRhymes(vowels,vowelIndex);
+				if(null != l) {
+					rhymes.addAll(l);
+				}
+			}
+		}
+		return rhymes;
 	}
 
 	public ArrayList<String> getNearRhymes(Data.Phoneme[] pronun) {

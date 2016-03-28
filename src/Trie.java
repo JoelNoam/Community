@@ -36,11 +36,30 @@ public class Trie {
 	public ArrayList<String> getNearRhymes(Data.Phoneme[] pronun) {
 		return root.getNearRhymes(pronun);
 	}
-	public ArrayList<String> getMultiRhymes(Data.Phoneme[] pronun, int vowelsLeft, boolean nearRhyme) {
-		return root.getMultiRhymes(pronun,vowelsLeft,nearRhyme);
+	public ArrayList<String> getMultiRhymes(Data.Phoneme[] pronun, int vowelsCount, boolean nearRhyme) {
+		return root.getMultiRhymes(pronun,vowelsCount,nearRhyme);
 	}
 	public ArrayList<String> getConsonanceRhymes(Data.Phoneme[] pronun) {
 		return root.getConsonanceRhymes(pronun);
+	}
+	public ArrayList<String> getAssonanceRhymes(Data.Phoneme[] pronun, int vowelsCount) {
+//		ArrayList<Stirng> L = new ArrayList<String>();
+		Data.Phoneme vowels[] = new Data.Phoneme[vowelsCount];
+		int i = vowelsCount - 1;
+		for(int j = pronun.length - 1; j >= 0 && i >= 0; j--) {
+			if(pronun[j].isVowel()) {
+				vowels[i] = pronun[j];
+				i--;
+			}
+		}
+		for(int j = 0; j < vowelsCount; j++) {
+			System.out.println("vowels[" + j + "] == " + vowels[j]);
+		}
+		if(null == vowels[0]) {
+			return new ArrayList<String>();
+		}
+		return root.getAssonanceRhymes(vowels, vowels.length-1);
+		
 	}
 	public ArrayList<String> getRhymes(Data.Phoneme[] pronun, String rhymeType) {
 		switch(rhymeType) { // works in java 7, should be lower case

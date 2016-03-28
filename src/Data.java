@@ -11,16 +11,23 @@ public class Data {
 		
 	private static final String DICT_FILE_NAME = "cmudict.dict";
 	private static final String CELEBS_FILE_NAME = "celebs";
-	public enum Phoneme { AA, AE, AH, AO, AW, AY, B, CH, D, DH, EH, ER, EY, F, G,
+	public enum Phoneme { AA, AE, AH, AH0, AO, AW, AY, B, CH, D, DH, EH, ER, EY, F, G,
 		HH, IH, IY, JH, K, L, M, N, NG, OW, OY, P, R, S, SH, T, TH, UH, UW, V, W, Y, Z, ZH;
 		public boolean isVowel() {
 	        switch(this) {
+	        		case AH0:
 	                case AA:case AE:case AH:case AO:case AW:case AY:case EH:case ER:
 	                case EY:case IH:case IY:case OW:case OY:case UH:case UW:
 	                        return true;
 	                default:
 	                        return false;
 	        }
+		}
+		public boolean isConsonant() {
+			return !isVowel();
+		}
+		public Phoneme[] consonants() {
+			return new Phoneme[]{B,CH,D,DH,F,G,HH,JH,K,L,M,N,NG,P,R,S,SH,T,TH,V,W,Y,Z,ZH};
 		}
 		public Phoneme[] similars() { // doesn't return itself
 			switch(this) {
@@ -81,6 +88,11 @@ public class Data {
 				celebV = new Phoneme[celebStrings.length];
 				for(int i = 0; i < celebStrings.length; i++) {
 					celebV[i] = Phoneme.valueOf(celebStrings[i]);
+//					if(celebStrings[i].contains("0")) {
+//						celebV[i] = Phoneme.AH0;
+//					} else {						
+//						celebV[i] = Phoneme.valueOf(celebStrings[i].replaceAll("[0-9]", ""));
+//					}
 				}
 				suffixTrie.put(name, celebV);
 				//prefixTrie.put(name, celebV);
@@ -111,11 +123,16 @@ public class Data {
 				
 //					System.out.println(line);
 				line = line.replaceAll("#.*", "").trim(); // get rid of comments
-				String[] parts = line.replaceAll("[0-9]", "").split(" "); // strips accent
+				//String[] parts = line.replaceAll("[0-9]", "").split(" "); // strips accent
+				String[] parts = line.split(" ");
 				String word = parts[0];
 				Phoneme[] pronun = new Phoneme[parts.length-1]; // don't include word itself
 				for(int i = 0; i < pronun.length; i++) {
-					pronun[i] = Phoneme.valueOf(parts[i+1]);
+//					if(parts[i+1].contains("0")) {
+//						pronun[i] = Phoneme.AH0;
+//					} else {						
+						pronun[i] = Phoneme.valueOf(parts[i+1].replaceAll("[0-9]", ""));
+//					}
 				}
 				words.put(word, pronun);
 			}
@@ -131,14 +148,15 @@ public class Data {
 			case "end":
 				return suffixTrie.getMultiRhymes(pronun, vowels, near);
 			case "assonance": // TODO make vowel trie, or do something for more than 1 vowel
-				Phoneme p = null;
+				/*Phoneme p = null;
 				for(int i = pronun.length - 1; i >= 0; i--) {
 					if(pronun[i].isVowel()) {
 						p = pronun[i];
 						break;
 					}
 				}
-				return finalVowelTable.get(p);
+				return finalVowelTable.get(p);*/
+				return suffixTrie.getAssonanceRhymes(pronun,vowels);
 			case "consonance":
 				return suffixTrie.getConsonanceRhymes(pronun);
 			default:
