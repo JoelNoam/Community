@@ -10,6 +10,7 @@ import java.util.ArrayList;
 public class Data {
 		
 	private static final String DICT_FILE_NAME = "cmudict.dict";
+//	private static final String CELEBS_FILE_NAME = "pantheon_all.dict";
 	private static final String CELEBS_FILE_NAME = "celebs";
 	public enum Phoneme { AA, AE, AH, AH0, AO, AW, AY, B, CH, D, DH, EH, ER, EY, F, G,
 		HH, IH, IY, JH, K, L, M, N, NG, OW, OY, P, R, S, SH, T, TH, UH, UW, V, W, Y, Z, ZH;
