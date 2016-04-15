@@ -1,3 +1,4 @@
+
 // looked at https://github.com/gaylemcd/ctci/tree/master/java/CtCILibrary/CtCILibrary
 
 import java.util.ArrayList;
@@ -17,7 +18,9 @@ public class TrieNode {
 	
 	public void addCeleb(String celebName, Data.Phoneme[] pronun) {
 //		int L = level; // for debugging
-		celebs.add(celebName);
+		if(celebs.isEmpty() || !celebs.get(celebs.size()-1).equals(celebName)) { // only add each in once
+			celebs.add(celebName);			
+		}
 //		TrieNode child = getChild(pronun[pronun.length - 1 - level]);
 		if(pronun.length <= level + 1) {  // base case
 			return;
