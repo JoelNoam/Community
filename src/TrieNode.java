@@ -1,4 +1,3 @@
-
 // looked at https://github.com/gaylemcd/ctci/tree/master/java/CtCILibrary/CtCILibrary
 
 import java.util.ArrayList;

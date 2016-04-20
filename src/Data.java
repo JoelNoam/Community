@@ -10,8 +10,12 @@ import java.util.ArrayList;
 public class Data {
 		
 	private static final String DICT_FILE_NAME = "cmudict.dict";
+	private static final String CELEBS_FILE_NAME = "names1.dict";
+//	private static final String CELEBS_FILE_NAME = "test.dict";
+//	private static final String CELEBS_FILE_NAME = "names.dict"; // based on pantheon
+	
 //	private static final String CELEBS_FILE_NAME = "pantheon_all.dict";
-	private static final String CELEBS_FILE_NAME = "celebs";
+//	private static final String CELEBS_FILE_NAME = "celebs";
 	public enum Phoneme { AA, AE, AH, AH0, AO, AW, AY, B, CH, D, DH, EH, ER, EY, F, G,
 		HH, IH, IY, JH, K, L, M, N, NG, OW, OY, P, R, S, SH, T, TH, UH, UW, V, W, Y, Z, ZH;
 		public boolean isVowel() {
@@ -83,12 +87,20 @@ public class Data {
 			Phoneme[] celebV;
 			while(sc.hasNextLine()) { // for each celebrity
 				line = sc.nextLine();
+				line = line.replaceAll("#.*", "").trim(); // get rid of comments
 				String[] words = line.split("\t");
 				name = words[0];
+				System.out.println(name);
 				celebStrings = words[1].split(" ");
 				celebV = new Phoneme[celebStrings.length];
 				for(int i = 0; i < celebStrings.length; i++) {
-					celebV[i] = Phoneme.valueOf(celebStrings[i]);
+//					System.out.println(celebStrings[i]);
+					try {
+						celebV[i] = Phoneme.valueOf(celebStrings[i]);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						System.err.println(celebStrings[i] + " was problem");
+					}
 //					if(celebStrings[i].contains("0")) {
 //						celebV[i] = Phoneme.AH0;
 //					} else {						
@@ -144,6 +156,7 @@ public class Data {
 			e.printStackTrace();
 		}
 	}
+	// THIS IS THE MAIN THING
 	public ArrayList<String> getRhymes(Phoneme[] pronun, String rhymeType, int vowels, boolean near) {
 		switch(rhymeType) {
 			case "end":
